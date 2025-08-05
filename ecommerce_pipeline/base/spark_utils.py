@@ -1,8 +1,9 @@
 
+from abc import ABC, abstractmethod
 from typing import Optional, Dict
 from pyspark.sql import SparkSession, DataFrame
 
-class PySparkJobInterface():
+class PySparkJobInterface(ABC):
     """An interface for managing PySpark jobs and sessions.
 
     This class provides a standardized way to initialize a SparkSession,
@@ -25,6 +26,16 @@ class PySparkJobInterface():
                 Defaults to None.
         """
         self.spark = self._create_spark_session(app_name=app_name, configs=configs)
+
+    @abstractmethod
+    def run(self) -> None:
+        """The main entry point for the Spark job.
+
+        Subclasses must implement this method to define the core logic of the
+        data processing job. This method is where you'll orchestrate your
+        ETL (Extract, Transform, Load) steps.
+        """
+        pass
 
     def _create_spark_session(self, app_name: str, configs: Optional[Dict[str, str]] = None) -> SparkSession:
         """Creates or retrieves a SparkSession with the specified configurations.
