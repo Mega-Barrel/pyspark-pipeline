@@ -1,4 +1,5 @@
 
+import time
 from ecommerce_pipeline.job.pipeline import PySparkJob
 
 if __name__ == "__main__":
@@ -13,14 +14,18 @@ if __name__ == "__main__":
 
         print("<<Transformation>>")
 
-        dim_user_df = job.dim_users(
-            identifiers_df,
-            tracks_df,
-            orders_df
+        orders = job.fact_orders(orders_df=orders_df)
+        events = job.fact_events(pages_df=pages_df, tracks_df=tracks_df)
+        user_stats = job.build_user_stats(
+            fact_events_df = events,
+            fact_orders_df = orders
         )
-        dim_user_df[0].show(10, truncate=False)
+        orders.show(n=10, truncate=False)
         print()
-        dim_user_df[1].show(10, truncate=False)
+        events.show(n=10, truncate=False)
+        print()
+        user_stats.show(n=10, truncate=False)
 
     finally:
+        time.sleep(10)
         job.stop()
