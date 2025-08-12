@@ -6,6 +6,7 @@ if __name__ == "__main__":
 
     job = PySparkJob()
     try:
+        # print(job.get_spark_version())
         print("<<Reading Data>>")
         identifiers_df = job.read_csv(input_path="data/identifies.csv")   # or "data/identifiers.csv"
         tracks_df      = job.read_csv(input_path="data/tracks.csv")
@@ -13,18 +14,15 @@ if __name__ == "__main__":
         pages_df       = job.read_csv(input_path="data/pages.csv")
 
         print("<<Transformation>>")
-
-        orders = job.fact_orders(orders_df=orders_df)
-        events = job.fact_events(pages_df=pages_df, tracks_df=tracks_df)
-        user_stats = job.build_user_stats(
-            fact_events_df = events,
-            fact_orders_df = orders
+        df = job.transform(
+            pages_df = pages_df,
+            tracks_df = tracks_df,
+            orders_df = orders_df
+            # write = True
         )
-        orders.show(n=10, truncate=False)
-        print()
-        events.show(n=10, truncate=False)
-        print()
-        user_stats.show(n=10, truncate=False)
+
+        print("<<Load Data>>")
+        df.show(n=10, truncate=False)
 
     finally:
         time.sleep(10)
